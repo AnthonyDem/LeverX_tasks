@@ -4,33 +4,31 @@ import ConversionData as cd
 import Exceptions as ex
 
 loader = ld.LoadJSON()
-conver_json = cd.JSONConversion()
-conver_xml = cd.XMLConversion()
+conversion_json = cd.JSONConversion()
+conversion_xml = cd.XMLConversion()
 
 
-def related_data(students, rooms):
-    for room in rooms:
-        room['students'] = []
+def related_json_data(students, rooms):
+    rooms_with_students= {room["id"]:{'name':room['name'], 'students':[]} for room in rooms}
+    related_data = []
     for student in students:
-        studroom = student.get('room')
-        for room in rooms:
-            if room.get('id') == studroom:
-                room.get('students').append(student)
-            else:
-                continue
-    return rooms
+        students_in_room=rooms_with_students.get(student.get('room'))
+        students_in_room.get('students').append(student)
+    for room in rooms_with_students.items():
+        related_data.append({'id': room[0], **room[1]})
+    return related_data
 
 
 def main(students_file, rooms_file, out_format):
     filename = 'output.' + out_format
     students = loader.load(filename=students_file)
     rooms = loader.load(filename=rooms_file)
-    data = related_data(students, rooms)
+    data_to_conversion = related_json_data(students, rooms)
     try:
         if out_format.lower() == 'json':
-            conver_json.write(data, filename)
+            conversion_json.write(data_to_conversion, filename)
         elif out_format.lower() == "xml":
-            conver_xml.write(data, filename)
+            conversion_xml.write(data_to_conversion, filename)
         else:
             raise ex.FormatException('Please enter format json or xml')
     except ex.FormatException as fe:
