@@ -7,9 +7,6 @@ class Version:
         self.version = self.convert_in_one_format(version)
         self.version_number, self.residue = self.split_version(self.version)
 
-    def __eq__(self, other):
-        return self.version == other.version
-
     def __lt__(self, other):
         if self.version_number != other.version_number:
             return self.version_number < other.version_number
@@ -19,7 +16,7 @@ class Version:
             return True
 
     @staticmethod
-    def convert_in_one_format( version):
+    def convert_in_one_format(version):
         transfers = {'a': '-alpha', 'b': '-beta', 'rc': '-rc'}
         if version.find('-') == -1:
             for key, value in transfers.items():
@@ -29,10 +26,7 @@ class Version:
     @staticmethod
     def split_version(version):
         splited_version = version.replace('-', '.').split('.')
-        for i in splited_version:
-            if i.isdigit():
-                i = int(i)
-
+        splited_version = [int(item) if item.isdigit() else str(item) for item in splited_version]
         version_number = splited_version[:3]
         if splited_version[3:]:
             residue = splited_version[3:]
