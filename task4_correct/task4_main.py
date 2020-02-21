@@ -2,37 +2,51 @@ import argparse
 import LoadData as ld
 import ConversionData as cd
 import Exceptions as ex
+import sql_queries
+import sql_functions
 
 loader = ld.LoadJSON()
 conversion_json = cd.JSONConversion()
 conversion_xml = cd.XMLConversion()
-
-
-def related_json_data(students, rooms):
-    rooms_with_students= {room["id"]:{'name':room['name'], 'students':[]} for room in rooms}
-    related_data = []
-    for student in students:
-        students_in_room=rooms_with_students.get(student.get('room'))
-        students_in_room.get('students').append(student)
-    for room in rooms_with_students.items():
-        related_data.append({'id': room[0], **room[1]})
-    return related_data
+db = sql_functions.DBops()
 
 
 def main(students_file, rooms_file, out_format):
     filename = 'output.' + out_format
     students = loader.load(filename=students_file)
     rooms = loader.load(filename=rooms_file)
-    data_to_conversion = related_json_data(students, rooms)
-    try:
-        if out_format.lower() == 'json':
-            conversion_json.write(data_to_conversion, filename)
-        elif out_format.lower() == "xml":
-            conversion_xml.write(data_to_conversion, filename)
-        else:
-            raise ex.FormatException('Please enter format json or xml')
-    except ex.FormatException as fe:
-        print(fe)
+
+    for query in sql_queries.CREATE_TABLE:
+        db.create_table(query)
+
+    for query in sql_queries.CREATE_INDEX:
+        db.execute_query(query)
+
+    db.insert_data(
+        "rooms",
+        ('id', 'name'),
+        rooms,
+
+    )
+    db.insert_data(
+        'students',
+        ('id', 'name', 'birthday', 'room', 'sex'),
+        students,
+    )
+
+    db.commit()
+
+    for num, query in enumerate(sql_queries.SELECT_DATA, 1):
+        result = db.execute_query(query)
+        try:
+            if out_format.lower() == 'json':
+                conversion_json.write(result, 'num' + str(num) + filename)
+            elif out_format.lower() == "xml":
+                conversion_xml.write(result, 'num' + str(num) + filename)
+            else:
+                raise ex.FormatException('Please enter format json or xml')
+        except ex.FormatException as fe:
+            print(fe)
 
 
 def argparser():

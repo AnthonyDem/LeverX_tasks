@@ -1,16 +1,12 @@
 CREATE_TABLE = [
-    {
-        "creation_sql_table":
-            """
+
+    """"
     CREATE TABLE IF NOT EXISTS rooms(
             id INT PRIMARY KEY,
             name VARCHAR(100) NOT NULL
     );
-    """
-    },
-    {
-        "cretion_sql_table":
-            """
+    """,
+    """   
     CREATE TABLE IF NOT EXISTS students(
             id INT PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
@@ -20,7 +16,7 @@ CREATE_TABLE = [
             FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
     );
     """
-    }
+
 ]
 
 SELECT_DATA = [
@@ -56,3 +52,6 @@ SELECT_DATA = [
 
 ]
 
+CREATE_INDEX = [
+    "CREATE INDEX roomid ON students(room_id);",
+]
