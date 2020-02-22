@@ -13,7 +13,7 @@ class ConversionData(ABC):
 class JSONConversion(ConversionData):
     def write(self, data, filename):
         with open(filename, 'w') as f:
-            f.write(json.dumps(data, indent=2))
+            f.write(json.dumps(data, indent=2, default=str))
 
 
 class XMLConversion(ConversionData):

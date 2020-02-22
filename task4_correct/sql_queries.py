@@ -1,7 +1,4 @@
-class Queries:
-    @staticmethod
-    def create_queries():
-        return [
+CREATE_QUERIES = [
             """CREATE TABLE IF NOT EXISTS rooms
                         (
                             id INT PRIMARY KEY,
@@ -12,8 +9,8 @@ class Queries:
                     CREATE TABLE IF NOT EXISTS students
                         (
                             id INT PRIMARY KEY,
-                            name VARCHAR(50) NOT NULL,
                             birthday DATE NOT NULL,
+                            name VARCHAR(50) NOT NULL,
                             room_id INT NOT NULL, 
                             sex ENUM("M","F") NOT NULL,
                             FOREIGN KEY (room_id) REFERENCES rooms(id) 
@@ -26,18 +23,16 @@ class Queries:
 
 
 
-    @staticmethod
-    def select_queries():
-        return [
+SELECT_QUERIES  = [
 
             """
-            SELECT  rooms.id , rooms.name , COUNT (students.id)
+            SELECT  rooms.id , rooms.name , COUNT(students.id) as students
             FROM rooms
             JOIN students ON rooms.id = students.room_id
             GROUP BY rooms.id  
             """,
             """
-            SELECT rooms.id , rooms.name , AVG(TIMESTAMPDIFF(YEAR, students.birthday,NOW)) as avg_age
+            SELECT rooms.id , rooms.name , AVG(TIMESTAMPDIFF(YEAR, students.birthday,NOW())) as avg_age
             FROM rooms
             JOIN students ON rooms.id = students.room_id
             GROUP BY rooms.id 
@@ -62,6 +57,4 @@ class Queries:
 
         ]
 
-    @staticmethod
-    def idex_query():
-        return "CREATE INDEX roomid ON students(room_id);",
+INDEX_QUERY = ["CREATE INDEX roomid ON students(room_id);"]
