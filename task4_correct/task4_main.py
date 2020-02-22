@@ -16,33 +16,22 @@ def main(students_file, rooms_file, out_format):
     students = loader.load(filename=students_file)
     rooms = loader.load(filename=rooms_file)
 
-    for query in sql_queries.CREATE_TABLE:
-        db.create_table(query)
+    db.create_table()
 
-    for query in sql_queries.CREATE_INDEX:
-        db.execute_query(query)
+    for query in sql_queries.Queries.create_queries():
+        db.select_query(query)
 
-    db.insert_data(
-        "rooms",
-        ('id', 'name'),
-        rooms,
-
-    )
-    db.insert_data(
-        'students',
-        ('id', 'name', 'birthday', 'room', 'sex'),
-        students,
-    )
+    db.insert_queries(rooms, students)
 
     db.commit()
 
-    for num, query in enumerate(sql_queries.SELECT_DATA, 1):
-        result = db.execute_query(query)
+    for query in sql_queries.Queries.select_queries():
+        result = db.select_query(query)
         try:
             if out_format.lower() == 'json':
-                conversion_json.write(result, 'num' + str(num) + filename)
+                conversion_json.write(result, filename)
             elif out_format.lower() == "xml":
-                conversion_xml.write(result, 'num' + str(num) + filename)
+                conversion_xml.write(result, filename)
             else:
                 raise ex.FormatException('Please enter format json or xml')
         except ex.FormatException as fe:

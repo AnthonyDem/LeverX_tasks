@@ -1,6 +1,7 @@
 import pymysql
 from pymysql.cursors import DictCursor
 from settings import SETTINGS
+from sql_queries import Queries
 
 
 class DBops:
@@ -12,21 +13,26 @@ class DBops:
                                        )
         self.cursor = self.connect.cursor()
 
-    def create_table(self, create_queries):
-        for query in create_queries:
+    def create_table(self):
+        for query in Queries.create_queries():
             self.cursor.execute(query)
 
-    def insert_data(self, table_name, data_headers, data):
-        values = ",".join(["%({})s".format(header) for header in data_headers])
-        if table_name == 'rooms':
-            self.cursor.executemany("INSERT INTO rooms VALUES {}".format(values), data)
-        elif table_name == 'students':
-            self.cursor.execute("INSERT INTO students VALUES {}".format(values), data)
+    def insert_queries(self, rooms_file, students_file):
+        rooms = make_tuple(rooms_file)
+        students = make_tuple(students_file)
+        sql = "INSERT INTO rooms (id, name) VALUES (%s, %s)"
+        sql2 = "INSERT INTO students (id, name, birthday, room_id, sex) VALUES (%s, %s, %s, %s, %s)"
+        self.cursor.executemany(sql, rooms)
+        self.cursor.executemany(sql2, students)
 
     def commit(self):
         self.connect.commit()
 
-    def execute_query(self, query):
+    def select_query(self, query):
         self.connect.cursor(DictCursor).execute(query)
         result = self.cursor.fetchall()
         return result
+
+
+def make_tuple(data):
+    return [tuple(item.values()) for item in data]
