@@ -6,8 +6,6 @@ import sql_queries
 import sql_functions
 
 loader = ld.LoadJSON()
-conversion_json = cd.JSONConversion()
-conversion_xml = cd.XMLConversion()
 
 
 def main(students_file, rooms_file, out_format):
@@ -29,8 +27,10 @@ def main(students_file, rooms_file, out_format):
         result = db.select_query(query)
         try:
             if out_format.lower() == 'json':
+                conversion_json = cd.JSONConversion()
                 conversion_json.write(result, 'select_num' + str(select_num) + filename)
             elif out_format.lower() == "xml":
+                conversion_xml = cd.XMLConversion()
                 conversion_xml.write(result, 'select_num' + str(select_num) + filename)
             else:
                 raise ex.FormatException('Please enter format json or xml')
