@@ -19,7 +19,6 @@ def query_name(select_num):
 
 
 def main(students_file, rooms_file, out_format):
-    filename = 'output.' + out_format
     loader = ld.LoadJSON()
     students = loader.load(filename=students_file)
     rooms = loader.load(filename=rooms_file)
@@ -39,10 +38,10 @@ def main(students_file, rooms_file, out_format):
         try:
             if out_format.lower() == 'json':
                 conversion_json = cd.JSONConversion()
-                conversion_json.write(result, 'select_' + query_name(select_num) + filename)
+                conversion_json.write(result, 'select_' + query_name(select_num) + out_format)
             elif out_format.lower() == "xml":
                 conversion_xml = cd.XMLConversion()
-                conversion_xml.write(result, 'select_' + query_name(select_num) + filename)
+                conversion_xml.write(result, 'select_' + query_name(select_num) + out_format)
             else:
                 raise ex.FormatException('Please enter format json or xml')
         except ex.FormatException as fe:
