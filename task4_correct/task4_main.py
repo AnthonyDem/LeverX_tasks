@@ -5,11 +5,22 @@ import Exceptions as ex
 import sql_queries
 import sql_functions
 
-loader = ld.LoadJSON()
+
+def query_name(select_num):
+    queries = {
+        '0': 'room_list_with_students_inside',
+        '1': 'top5_avg_age',
+        '2': 'top5_max_age_diff',
+        '3': 'sex_diff'
+    }
+    for i in queries:
+        if select_num == int(i):
+            return queries.get(i)
 
 
 def main(students_file, rooms_file, out_format):
     filename = 'output.' + out_format
+    loader = ld.LoadJSON()
     students = loader.load(filename=students_file)
     rooms = loader.load(filename=rooms_file)
     db = sql_functions.DBops()
@@ -36,18 +47,6 @@ def main(students_file, rooms_file, out_format):
                 raise ex.FormatException('Please enter format json or xml')
         except ex.FormatException as fe:
             print(fe)
-
-
-def query_name(select_num):
-    queries = {
-        '0': 'room_list_with_students_inside',
-        '1': 'top5_avg_age',
-        '2': 'top5_max_age_diff',
-        '3': 'sex_diff'
-    }
-    for i in queries:
-        if select_num == int(i):
-            return queries.get(i)
 
 
 def argparser():
